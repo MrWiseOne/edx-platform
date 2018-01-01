@@ -656,6 +656,23 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @override_settings(LANGUAGE_CODE='fr')
+    def test_html_lang_attribute_is_dynamic_for_invalid_certificate_html_view(self):
+        """
+        Tests that Certificate HTML Web View's lang attribute is based on user language.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        # invalidate certificate and verify that "Cannot Find Certificate" is returned
+        self.cert.invalidate()
+        response = self.client.get(test_url)
+        self.assertIn('<html class="no-js" lang="fr">', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
         """
         Tests that Certificate HTML Web View returns "Cannot Find Certificate" if certificate is not viewable yet.
