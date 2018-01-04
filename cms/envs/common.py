@@ -1123,10 +1123,6 @@ INSTALLED_APPS = [
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
 
-    # Dynamic schedules
-    'openedx.core.djangoapps.ace_common.apps.AceCommonConfig',
-    'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
-
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
@@ -1504,3 +1500,9 @@ ZENDESK_CUSTOM_FIELDS = {}
 # Once a user has watched this percentage of a video, mark it as complete:
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+
+############## Installed Django Apps #########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_installable_apps(ProjectType.cms))

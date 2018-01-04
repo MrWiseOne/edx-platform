@@ -63,5 +63,14 @@ setup(
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
         ],
+        "lms.djangoapp": [
+            "grades = lms.djangoapps.grades.apps:GradesConfig",
+            "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+        ],
+        "cms.djangoapp": [
+            "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+        ],
     }
 )
