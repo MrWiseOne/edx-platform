@@ -7,7 +7,7 @@ from abc import ABCMeta
 from django.core.files.storage import get_storage_class
 from xblock.fields import List
 
-from openedx.core.lib.api.plugins import PluginError
+from openedx.core.lib.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 
