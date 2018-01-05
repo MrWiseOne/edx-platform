@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from opaque_keys.edx.keys import AssetKey, CourseKey
@@ -34,7 +34,8 @@ REQUEST_DEFAULTS = {
     'page_size': 50,
     'sort': 'date_added',
     'direction': '',
-    'asset_type': ''
+    'asset_type': '',
+    'text_search': '',
 }
 
 
@@ -54,6 +55,8 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
             page_size: the number of items per page (defaults to 50)
             sort: the asset field to sort by (defaults to 'date_added')
             direction: the sort direction (defaults to 'descending')
+            asset_type: the file type to filter items to (defaults to All)
+            text_search: string to filter results by file name (defaults to '')
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -112,8 +115,9 @@ def _assets_json(request, course_key):
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
     request_options = _parse_request_to_dictionary(request)
+    country_code = request.LANGUAGE_CODE.split('-')[0]
 
-    filter_parameters = None
+    filter_parameters = {}
 
     if request_options['requested_asset_type']:
         filters_are_invalid_error = _get_error_if_invalid_parameters(request_options['requested_asset_type'])
@@ -121,7 +125,10 @@ def _assets_json(request, course_key):
         if filters_are_invalid_error is not None:
             return filters_are_invalid_error
 
-        filter_parameters = _get_filter_parameters_for_mongo(request_options['requested_asset_type'])
+        filter_parameters.update(_get_filter_parameters_for_mongo(request_options['requested_asset_type']))
+
+    if request_options['requested_text_search']:
+        filter_parameters.update(_format_search_for_mongo_text(request_options['requested_text_search'], country_code))
 
     sort_type_and_direction = _get_sort_type_and_direction(request_options)
 
@@ -156,7 +163,7 @@ def _assets_json(request, course_key):
         'assets': assets_in_json_format,
         'sort': request_options['requested_sort'],
         'direction': request_options['requested_sort_direction'],
-        'assetTypes': _get_requested_file_types_from_requested_filter(request_options['requested_asset_type']),
+        'textSearch': request_options['requested_text_search'],
     }
 
     return JsonResponse(response_payload)
@@ -169,6 +176,7 @@ def _parse_request_to_dictionary(request):
         'requested_sort': _get_requested_attribute(request, 'sort'),
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
         'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
+        'requested_text_search': _get_requested_attribute(request, 'text_search'),
     }
 
 
@@ -224,6 +232,15 @@ def _get_mongo_where_operator_parameters_for_filters(requested_file_types):
 def _format_javascript_filters_for_mongo_where(javascript_filters):
     return {
         '$where': javascript_filters,
+    }
+
+
+def _format_search_for_mongo_text(text_search, country_code):
+    return {
+        '$text': {
+            '$search': text_search,
+            '$language': country_code,
+        },
     }
 
 

@@ -501,6 +501,14 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
+        create_collection_index(
+            self.fs_files,
+            [
+                ('displayname', pymongo.TEXT)
+            ],
+            sparse=True,
+            background=True
+        )
 
 
 def query_for_course(course_key, category=None):
