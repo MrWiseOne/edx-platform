@@ -207,6 +207,7 @@
               .course-info,
               .wrapper-course-actions {
                 flex-grow: 1;
+                align-items: center;
 
                 .action {
                   @include margin-right(0);
