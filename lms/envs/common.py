@@ -2105,9 +2105,6 @@ INSTALLED_APPS = [
     # For content serving
     'openedx.core.djangoapps.contentserver',
 
-    # Theming
-    'openedx.core.djangoapps.theming.apps.ThemingConfig',
-
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 

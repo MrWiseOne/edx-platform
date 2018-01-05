@@ -67,10 +67,12 @@ setup(
             "grades = lms.djangoapps.grades.apps:GradesConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+            "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
+            "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
         ],
     }
 )
