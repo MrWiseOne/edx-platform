@@ -3,6 +3,7 @@
 from unittest import skipUnless
 
 import ddt
+import os
 from django.conf import settings
 from django.test import TestCase
 from paver.easy import call_task
@@ -49,6 +50,16 @@ class PipelineRenderTest(TestCase):
         Create static assets once for all pipeline render tests.
         """
         super(PipelineRenderTest, cls).setUpClass()
+        # Ensure that the npm requirements are always installed before updating static assets.
+        # Restore the original environment var value after installing npm requirements.
+        prereq_install_val_orig = os.environ.get('NO_PREREQ_INSTALL')
+        os.environ['NO_PREREQ_INSTALL'] = 'False'
+        call_task('pavelib.prereqs.install_node_prereqs')
+        if prereq_install_val_orig is None:
+            del os.environ['NO_PREREQ_INSTALL']
+        else:
+            os.environ['NO_PREREQ_INSTALL'] = prereq_install_val_orig
+        # Update all static assets.
         call_task('pavelib.assets.update_assets', args=('lms', '--settings=test', '--themes=no'))
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
