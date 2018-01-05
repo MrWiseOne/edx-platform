@@ -2015,14 +2015,6 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
-############################# Persistent Grades ####################################
-
-# Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
-
-# Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
-
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
@@ -3437,20 +3429,6 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 
-############## Settings for ACE ####################################
-ACE_ENABLED_CHANNELS = [
-    'file_email'
-]
-ACE_ENABLED_POLICIES = [
-    'bulk_email_optout'
-]
-ACE_CHANNEL_SAILTHRU_DEBUG = True
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = 'Automated Communication Engine Email'
-ACE_CHANNEL_SAILTHRU_API_KEY = None
-ACE_CHANNEL_SAILTHRU_API_SECRET = None
-
-ACE_ROUTING_KEY = LOW_PRIORITY_QUEUE
-
 # Initialize to 'unknown', but read from JSON in aws.py
 EDX_PLATFORM_REVISION = 'unknown'
 
@@ -3463,7 +3441,9 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 ############### Settings for Django Rate limit #####################
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '30/m'
-############## Installed Django Apps #########################
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
-INSTALLED_APPS.extend(DjangoAppRegistry.get_installable_apps(ProjectType.lms))
+############## Plugin Django Apps #########################
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.lms))
+DjangoAppRegistry.import_plugin_settings(__name__, ProjectType.lms, SettingsType.common)

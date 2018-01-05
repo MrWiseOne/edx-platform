@@ -1501,5 +1501,6 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
 ############## Installed Django Apps #########################
 
-from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType
-INSTALLED_APPS.extend(DjangoAppRegistry.get_installable_apps(ProjectType.cms))
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+INSTALLED_APPS.extend(DjangoAppRegistry.get_plugin_apps(ProjectType.cms))
+DjangoAppRegistry.import_plugin_settings(__name__, ProjectType.cms, SettingsType.common)

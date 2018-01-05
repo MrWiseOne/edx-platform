@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This is the default template for our main set of AWS servers. This does NOT
-cover the content machines, which use content.py
+This is the default template for our main set of AWS servers.
 
 Common traits:
 * Use memcached, and cache-backed sessions
@@ -46,6 +45,20 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
+########################## NON-SECURE ENV CONFIG ##############################
+# Things like server locations, ports, etc.
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+    ENV_TOKENS = json.load(env_file)
+
+############################## SECURE AUTH ITEMS ###############
+# Secret things: passwords, access keys, etc.
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+    AUTH_TOKENS = json.load(auth_file)
+
+from openedx.core.djangolib.django_plugins import DjangoAppRegistry, ProjectType, SettingsType
+DjangoAppRegistry.import_plugin_settings(__name__, ProjectType.lms, SettingsType.aws)
 
 ################################ ALWAYS THE SAME ##############################
 
@@ -112,12 +125,6 @@ if os.environ.get('QUEUE') == 'high_mem':
     CELERYD_MAX_TASKS_PER_CHILD = 1
 
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
-
-########################## NON-SECURE ENV CONFIG ##############################
-# Things like server locations, ports, etc.
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
-    ENV_TOKENS = json.load(env_file)
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
@@ -270,12 +277,6 @@ BULK_EMAIL_ROUTING_KEY = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY', HIGH_PRIORITY_
 # We can run smaller jobs on the low priority queue. See note above for why
 # we have to reset the value here.
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL_JOBS', LOW_PRIORITY_QUEUE)
-
-# Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
-
-# Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
 
 # Queue to use for expiring old entitlements
 ENTITLEMENTS_EXPIRATION_ROUTING_KEY = ENV_TOKENS.get('ENTITLEMENTS_EXPIRATION_ROUTING_KEY', LOW_PRIORITY_QUEUE)
@@ -486,12 +487,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
 # Field overrides. To use the IDDE feature, add
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
 FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
-
-############################## SECURE AUTH ITEMS ###############
-# Secret things: passwords, access keys, etc.
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
-    AUTH_TOKENS = json.load(auth_file)
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
@@ -1074,15 +1069,6 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     'PARENTAL_CONSENT_AGE_LIMIT',
     PARENTAL_CONSENT_AGE_LIMIT
 )
-
-############## Settings for ACE ####################################
-ACE_ENABLED_CHANNELS = ENV_TOKENS.get('ACE_ENABLED_CHANNELS', ACE_ENABLED_CHANNELS)
-ACE_ENABLED_POLICIES = ENV_TOKENS.get('ACE_ENABLED_POLICIES', ACE_ENABLED_POLICIES)
-ACE_CHANNEL_SAILTHRU_DEBUG = ENV_TOKENS.get('ACE_CHANNEL_SAILTHRU_DEBUG', ACE_CHANNEL_SAILTHRU_DEBUG)
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = ENV_TOKENS.get('ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME', ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME)
-ACE_CHANNEL_SAILTHRU_API_KEY = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_KEY', ACE_CHANNEL_SAILTHRU_API_KEY)
-ACE_CHANNEL_SAILTHRU_API_SECRET = AUTH_TOKENS.get('ACE_CHANNEL_SAILTHRU_API_SECRET', ACE_CHANNEL_SAILTHRU_API_SECRET)
-ACE_ROUTING_KEY = ENV_TOKENS.get('ACE_ROUTING_KEY', ACE_ROUTING_KEY)
 
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
 EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)

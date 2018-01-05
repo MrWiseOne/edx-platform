@@ -7,7 +7,7 @@ Signal handlers are connected here.
 from django.apps import AppConfig
 from django.conf import settings
 from edx_proctoring.runtime import set_runtime_service
-from openedx.core.djangolib.django_plugins import ProjectType, PluginURL
+from openedx.core.djangolib.django_plugins import ProjectType, SettingsType, PluginURL, PluginSettings
 
 
 class GradesConfig(AppConfig):
@@ -22,6 +22,13 @@ class GradesConfig(AppConfig):
                 PluginURL.namespace: u'grades_api',
                 PluginURL.prefix: u'api/grades/',
                 PluginURL.relative_path: u'api.urls',
+            }
+        },
+        PluginSettings.config: {
+            ProjectType.lms: {
+                SettingsType.aws: {PluginSettings.relative_path: u'settings.aws'},
+                SettingsType.common: {PluginSettings.relative_path: u'settings.common'},
+                SettingsType.test: {PluginSettings.relative_path: u'settings.test'},
             }
         }
     }
