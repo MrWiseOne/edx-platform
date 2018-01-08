@@ -51,16 +51,22 @@ class PipelineRenderTest(TestCase):
         """
         super(PipelineRenderTest, cls).setUpClass()
         # Ensure that the npm requirements are always installed before updating static assets.
-        # Restore the original environment var value after installing npm requirements.
-        prereq_install_val_orig = os.environ.get('NO_PREREQ_INSTALL')
+        cls.PREREQ_INSTALL_VALUE_ORIG = os.environ.get('NO_PREREQ_INSTALL')
         os.environ['NO_PREREQ_INSTALL'] = 'False'
         call_task('pavelib.prereqs.install_node_prereqs')
-        if prereq_install_val_orig is None:
-            del os.environ['NO_PREREQ_INSTALL']
-        else:
-            os.environ['NO_PREREQ_INSTALL'] = prereq_install_val_orig
         # Update all static assets.
         call_task('pavelib.assets.update_assets', args=('lms', '--settings=test', '--themes=no'))
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Set environment back to original state.
+        """
+        # Restore the original environment var value after running all tests in the class.
+        if cls.PREREQ_INSTALL_VALUE_ORIG is None:
+            del os.environ['NO_PREREQ_INSTALL']
+        else:
+            os.environ['NO_PREREQ_INSTALL'] = cls.PREREQ_INSTALL_VALUE_ORIG
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
     @ddt.data(
