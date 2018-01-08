@@ -48,6 +48,7 @@ ALLOWED_HOSTS = [
     'test-site.testserver',
     'testserver.fakeother',
     'edx.org',
+    'microsite.example.com',
 ]
 
 # mongo connection settings

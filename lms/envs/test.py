@@ -41,7 +41,8 @@ ALLOWED_HOSTS = [
     '.testserver.fake',
     'test-site.testserver',
     'testserver.fakeother',
-    'edx.org'
+    'edx.org',
+    'microsite.example.com',
 ]
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
