@@ -47,6 +47,7 @@ ALLOWED_HOSTS = [
     '.testserver.fake',
     'test-site.testserver',
     'testserver.fakeother',
+    'edx.org',
 ]
 
 # mongo connection settings
